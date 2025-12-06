@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Llamalitica on Google Cloud - Healthcare AI Platform</title>
+    <link rel="icon" type="image/x-icon" href="https://img.icons8.com/color/96/000000/artificial-intelligence.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #06b6d4;
+            --accent: #8b5cf6;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+            --glass: rgba(255, 255, 255, 0.1);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+        }
+
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.15) 0%, transparent 20%),
+                radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.1) 0%, transparent 30%);
+        }
+
+        /* 3D Background Effects */
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .floating-shapes {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0.3;
+            animation: float 20s infinite linear;
+        }
+
+        .shape:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            background: var(--primary);
+            top: 10%;
+            left: 5%;
+            animation-delay: 0s;
+        }
+
+        .shape:nth-child(2) {
+            width: 200px;
+            height: 200px;
+            background: var(--secondary);
+            top: 60%;
+            right: 10%;
+            animation-delay: -5s;
+            animation-duration: 25s;
+        }
+
+        .shape:nth-child(3) {
+            width: 150px;
+            height: 150px;
+            background: var(--accent);
+            bottom: 20%;
+            left: 20%;
+            animation-delay: -10s;
+            animation-duration: 30s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            25% {
+                transform: translate(50px, 50px) rotate(90deg);
+            }
+            50% {
+                transform: translate(0, 100px) rotate(180deg);
+            }
+            75% {
+                transform: translate(-50px, 50px) rotate(270deg);
+            }
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header & Navigation */
+        header {
+            padding: 30px 0;
+            position: relative;
+            backdrop-filter: blur(10px);
+            background: var(--glass);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-link {
+            color: var(--light);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient);
+            transition: var(--transition);
+            z-index: -1;
+        }
+
+        .nav-link:hover::before {
+            left: 0;
+        }
+
+        .nav-link:hover {
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 100px 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1.1;
+            text-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: #94a3b8;
+            max-width: 700px;
+            margin: 0 auto 40px;
+            line-height: 1.6;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 40px;
+        }
+
+        .btn {
+            padding: 16px 32px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(99, 102, 241, 0.6);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--light);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        /* 3D Card Sections */
+        .section {
+            margin: 100px 0;
+            position: relative;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 50px;
+            text-align: center;
+            position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--gradient);
+            border-radius: 2px;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px;
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient);
+            opacity: 0;
+            transition: var(--transition);
+            z-index: -1;
+        }
+
+        .card:hover {
+            transform: translateY(-15px) rotateX(5deg);
+            box-shadow: var(--shadow);
+        }
+
+        .card:hover::before {
+            opacity: 0.1;
+        }
+
+        .card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: var(--light);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .card-content {
+            color: #cbd5e1;
+            line-height: 1.7;
+            font-size: 1.1rem;
+        }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 50px;
+        }
+
+        .feature {
+            text-align: center;
+            padding: 30px;
+            background: var(--glass);
+            border-radius: 20px;
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .feature:hover {
+            transform: translateY(-10px);
+            border-color: rgba(99, 102, 241, 0.3);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature-icon {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 20px;
+            background: var(--gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+        }
+
+        /* Solution Section */
+        .solution-container {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(6, 182, 212, 0.1));
+            border-radius: 30px;
+            padding: 60px;
+            margin-top: 50px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .solution-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(transparent, rgba(99, 102, 241, 0.1), transparent 30%);
+            animation: rotate 10s linear infinite;
+        }
+
+        @keyframes rotate {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Contact Section */
+        .contact-section {
+            text-align: center;
+            padding: 80px 0;
+            background: linear-gradient(180deg, transparent, rgba(99, 102, 241, 0.05));
+            border-radius: 40px;
+            margin-top: 100px;
+        }
+
+        .contact-info {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            background: var(--glass);
+            border-radius: 20px;
+            transition: var(--transition);
+        }
+
+        .contact-item:hover {
+            transform: translateY(-5px);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 50px 0;
+            margin-top: 100px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
+        }
+
+        .google-cloud-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50px;
+            margin-top: 30px;
+            font-weight: 600;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .solution-container {
+                padding: 30px;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+
+        /* Loading Animation */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .loader-content {
+            text-align: center;
+        }
+
+        .loader-spinner {
+            width: 80px;
+            height: 80px;
+            border: 5px solid transparent;
+            border-top: 5px solid var(--primary);
+            border-right: 5px solid var(--secondary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loader" id="loader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <h2>Loading Llamalitica Experience</h2>
+        </div>
+    </div>
+
+    <!-- 3D Background Shapes -->
+    <div class="floating-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+
+    <!-- Particles Container -->
+    <div id="particles-js"></div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="nav-container">
+                <a href="#" class="logo">
+                    <div class="logo-icon">L</div>
+                    <span>Llamalitica</span>
+                </a>
+                <nav class="nav-links">
+                    <a href="#solution" class="nav-link">Solution</a>
+                    <a href="#features" class="nav-link">Features</a>
+                    <a href="#google-cloud" class="nav-link">Google Cloud</a>
+                    <a href="#contact" class="nav-link">Contact</a>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1>Llamalitica on Google Cloud</h1>
+            <p class="hero-subtitle">
+                Transform healthcare with our AI-powered platform for clinical data analysis, 
+                natural language processing, and intelligent workflow automation.
+            </p>
+            <div class="hero-buttons">
+                <a href="#solution" class="btn btn-primary">
+                    <span>Explore Solution</span>
+                    <span>→</span>
+                </a>
+                <a href="#contact" class="btn btn-secondary">
+                    <span>Contact Sales</span>
+                    <span>✉</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- Company Description Section -->
+        <section class="section" id="solution">
+            <h2 class="section-title">AI-Powered Healthcare Platform</h2>
+            <div class="card">
+                <h3><div class="card-icon">🏥</div> Company Overview</h3>
+                <div class="card-content">
+                    <p>Llamalitica offers a comprehensive solution for healthcare with customizable modules that enable advanced analysis of clinical data through artificial intelligence.</p>
+                    <p>This platform is capable of extracting information from a wide variety of formats in electronic medical records, including documents, PDFs, images, video, audio, and text.</p>
+                    <p>Key features include generative AI, natural language processing, advanced search, alert systems, cohort selection, population health dashboards, deep phenotyping, and tools for clinical research.</p>
+                    <p>Developed and validated in real healthcare environments, Llamalitica stands out for its flexibility, adapting to any area of the healthcare system that relies on data analysis.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Key Features Section -->
+        <section class="section" id="features">
+            <h2 class="section-title">Core Capabilities</h2>
+            <div class="features-grid">
+                <div class="feature">
+                    <div class="feature-icon">🤖</div>
+                    <h3>Generative AI</h3>
+                    <p>Advanced AI models for clinical documentation and report generation</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🗣️</div>
+                    <h3>Natural Language Processing</h3>
+                    <p>Extract insights from clinical notes and patient conversations</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🔍</div>
+                    <h3>Advanced Search</h3>
+                    <p>Intelligent search across all clinical data formats</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">📊</div>
+                    <h3>Population Health</h3>
+                    <p>Comprehensive dashboards for population health management</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">⚕️</div>
+                    <h3>Clinical Research</h3>
+                    <p>Tools for cohort selection and clinical trial support</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🔗</div>
+                    <h3>Interoperability</h3>
+                    <p>FHIR-based integration with healthcare systems</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Google Cloud Solution Section -->
+        <section class="section" id="google-cloud">
+            <h2 class="section-title">Powered by Google Cloud</h2>
+            <div class="solution-container">
+                <div class="card">
+                    <h3><div class="card-icon">☁️</div>Solution Architecture</h3>
+                    <div class="card-content">
+                        <p><strong>Llamalitica on Google Cloud</strong> leverages Google Cloud's AI and data analytics services to deliver a scalable, secure, and interoperable healthcare AI platform.</p>
+                        
+                        <h4 style="margin-top: 25px; margin-bottom: 15px; color: var(--secondary);">Google Cloud Services Used:</h4>
+                        <ul style="list-style: none; padding-left: 0;">
+                            <li style="margin-bottom: 10px; padding-left: 25px; position: relative;">✅ <strong>Vertex AI</strong> - Training and deploying custom ML models for clinical NLP</li>
+                            <li style="margin-bottom: 10px; padding-left: 25px; position: relative;">✅ <strong>Healthcare API</strong> - FHIR support for EHR integration</li>
+                            <li style="margin-bottom: 10px; padding-left: 25px; position: relative;">✅ <strong>BigQuery</strong> - Population health analytics and insights</li>
+                            <li style="margin-bottom: 10px; padding-left: 25px; position: relative;">✅ <strong>Cloud Storage</strong> - Secure management of multimodal medical data</li>
+                            <li style="margin-bottom: 10px; padding-left: 25px; position: relative;">✅ <strong>Google Workspace</strong> - Clinical workflow integration</li>
+                            <li style="margin-bottom: 10px; padding-left: 25px; position: relative;">✅ <strong>Cloud Run / Kubernetes</strong> - Scalable deployment</li>
+                        </ul>
+                        
+                        <p style="margin-top: 25px;">This integration delivers a scalable, secure, and intelligent platform that enhances clinical decision-making, automates administrative tasks, and accelerates medical research.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Target Markets & Industries -->
+        <section class="section">
+            <h2 class="section-title">Target Markets & Industries</h2>
+            <div class="cards-grid">
+                <div class="card">
+                    <h3><div class="card-icon">🎯</div>Target Markets</h3>
+                    <div class="card-content">
+                        <ul>
+                            <li>Large Enterprises (Hospital systems)</li>
+                            <li>Government Health Agencies</li>
+                            <li>Educational & Research Institutions</li>
+                            <li>Small & Medium Healthcare Businesses</li>
+                            <li>Private Clinics & Medical Centers</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3><div class="card-icon">🏭</div>Target Industries</h3>
+                    <div class="card-content">
+                        <ul>
+                            <li>Healthcare & Life Sciences</li>
+                            <li>Government Healthcare</li>
+                            <li>Medical Education & Research</li>
+                            <li>Software & Internet (Health Tech)</li>
+                            <li>Business & Professional Services</li>
+                            <li>Non-Profit Healthcare Organizations</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section class="contact-section" id="contact">
+            <h2 class="section-title">Get In Touch</h2>
+            <p style="font-size: 1.2rem; max-width: 600px; margin: 0 auto 40px; color: #94a3b8;">
+                Ready to transform your healthcare organization with AI? Contact us to schedule a demo.
+            </p>
+            <div class="contact-info">
+                <div class="contact-item">
+                    <span style="font-size: 1.5rem;">🏢</span>
+                    <div>
+                        <strong>Company</strong>
+                        <div>Llamalitica</div>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <span style="font-size: 1.5rem;">📧</span>
+                    <div>
+                        <strong>Email</strong>
+                        <div>frederic@llamalitica.help</div>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <span style="font-size: 1.5rem;">🌐</span>
+                    <div>
+                        <strong>Website</strong>
+                        <div>llamalitica.help</div>
+                    </div>
+                </div>
+            </div>
+            <a href="mailto:frederic@llamalitica.help" class="btn btn-primary" style="margin-top: 40px;">
+                <span>Contact Us Now</span>
+                <span>📩</span>
+            </a>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <div class="google-cloud-badge">
+                <span style="font-size: 1.5rem;">☁️</span>
+                <span>Built on Google Cloud</span>
+            </div>
+            <p style="margin-top: 30px;">© 2024 Llamalitica. All rights reserved.</p>
+            <p style="margin-top: 10px; font-size: 0.9rem; color: #64748b;">
+                AI-powered Healthcare Platform | Solution Partner
+            </p>
+        </footer>
+    </div>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        // Hide loader when page loads
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                document.getElementById('loader').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('loader').style.display = 'none';
+                }, 500);
+            }, 1000);
+        });
+
+        // Initialize particles.js
+        document.addEventListener('DOMContentLoaded', function() {
+            particlesJS('particles-js', {
+                particles: {
+                    number: { value: 80, density: { enable: true, value_area: 800 } },
+                    color: { value: ["#6366f1", "#06b6d4", "#8b5cf6"] },
+                    shape: { type: "circle" },
+                    opacity: { value: 0.5, random: true },
+                    size: { value: 3, random: true },
+                    line_linked: {
+                        enable: true,
+                        distance: 150,
+                        color: "#6366f1",
+                        opacity: 0.2,
+                        width: 1
+                    },
+                    move: {
+                        enable: true,
+                        speed: 2,
+                        direction: "none",
+                        random: true,
+                        straight: false,
+                        out_mode: "out",
+                        bounce: false
+                    }
+                },
+                interactivity: {
+                    detect_on: "canvas",
+                    events: {
+                        onhover: { enable: true, mode: "repulse" },
+                        onclick: { enable: true, mode: "push" }
+                    }
+                }
+            });
+
+            // Add 3D hover effect to cards
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    
+                    const rotateY = (x - centerX) / 25;
+                    const rotateX = (centerY - y) / 25;
+                    
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-10px)`;
+                });
+                
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0)';
+                });
+            });
+
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    if(targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
+                    if(targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        });
+
+        // Add parallax effect on scroll
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const shapes = document.querySelectorAll('.shape');
+            
+            shapes.forEach((shape, index) => {
+                const speed = 0.5 + (index * 0.1);
+                const yPos = -(scrolled * speed);
+                shape.style.transform = `translateY(${yPos}px)`;
+            });
+        });
+    </script>
+</body>
+</html>
